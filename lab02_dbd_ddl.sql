@@ -45,7 +45,8 @@ create table Direcciones (
 	numero_calle int not null,
 	comuna varchar(200) not null,
 	region varchar(200) not null,
-	constraint id_direccion_pk primary key (id_direccion)	
+	constraint id_direccion_pk primary key (id_direccion),
+	constraint numero_calle check (numero_calle > 0)
 )
 
 create table Tipos_Usuarios (
