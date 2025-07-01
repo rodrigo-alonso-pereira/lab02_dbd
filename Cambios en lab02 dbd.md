@@ -4,3 +4,4 @@
 1. Tablas con nombres en plural.
 2. Se agregan el constraint unique para valores que deben ser unicos en tabla, segun regla de negocio.
 3. Cambio de tipo valor serial por int generated always as identity.
+4. Check para numero_calle > 0.
