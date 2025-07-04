@@ -8,7 +8,8 @@ create table Estados_Tarifas (
 create table Tipos_Tarifas (
 	id_tipo_tarifa int generated always as identity,
 	nombre varchar(200) not null,
-	constraint id_tipo_tarifa_pk primary key (id_tipo_tarifa)
+	constraint id_tipo_tarifa_pk primary key (id_tipo_tarifa),
+	constraint nombre_tipo_tarifa_unique unique (nombre)
 )
 
 create table Estados_Vehiculos (
@@ -104,7 +105,8 @@ create table Tarifas (
 	constraint estado_tarifa_id_fk foreign key (estado_tarifa_id) references Estados_Tarifas(id_estado_tarifa),
 	constraint valor check (valor >= 0),
 	constraint tipo_tarifa_id_check check (tipo_tarifa_id > 0),
-	constraint estado_tarifa_id_check check (estado_tarifa_id > 0)
+	constraint estado_tarifa_id_check check (estado_tarifa_id > 0),
+	constraint fechas_alquiler_check check (fecha_termino_vigencia_tarifa > fecha_inicio_vigencia_tarifa)
 )
 
 create table Sucursales (
@@ -114,7 +116,8 @@ create table Sucursales (
 	direccion_id int not null,
 	constraint id_sucursal_pk primary key (id_sucursal),
 	constraint direccion_id_fk foreign key (direccion_id) references direcciones (id_direccion),
-	constraint direccion_id_check check (direccion_id > 0) 
+	constraint direccion_id_check check (direccion_id > 0),
+	constraint horas_operacion_check check (hora_fin_operacion > hora_inicio_operacion)
 )
 
 create table Telefonos_Sucursales (
@@ -145,7 +148,8 @@ create table Usuarios (
 	constraint rol_id check (rol_id > 0),
 	constraint tipo_usuario_id check (tipo_usuario_id > 0),
 	constraint direccion_id_check check (direccion_id > 0),
-	constraint email_unique unique (email)
+	constraint email_unique unique (email),
+	constraint rut_unique unique (rut)
 )
 
 create table Telefonos_Usuarios (
@@ -162,6 +166,7 @@ create table Pagos (
 	id_pago int generated always as identity,
 	fecha_pago timestamp not null default now(),
 	numero_cuotas int not null default 1,
+	total_pagado int,
 	metodo_pago_id int not null,
 	constraint id_pago_pk primary key (id_pago),
 	constraint metodo_pago_id_fk foreign key (metodo_pago_id) references metodos_pagos (id_metodo_pago),
@@ -186,7 +191,7 @@ create table Cuotas (
 	monto_cuota int not null,
 	numero_cuota int not null,
 	fecha_vencimiento_cuota date not null,
-	fecha_pago_cuota date not null,
+	fecha_pago_cuota date,
 	pago_id int not null,
 	estado_cuota_id int not null,
 	constraint id_cuota_pk primary key (id_cuota),
@@ -204,7 +209,8 @@ create table Modelos (
 	marca_id int not null,
 	constraint id_modelo_pk primary key (id_modelo),
 	constraint marca_id_fk foreign key (marca_id) references marcas (id_marca),
-	constraint marca_id_check check (marca_id > 0)
+	constraint marca_id_check check (marca_id > 0),
+	constraint nombre_marca_id_unique unique (nombre, marca_id)
 )
 
 create table Vehiculos (
@@ -225,7 +231,8 @@ create table Vehiculos (
 	constraint estado_vehiculo_id_check check (estado_vehiculo_id > 0),
 	constraint tipo_vehiculo_id_check check (tipo_vehiculo_id > 0),
 	constraint sucursal_id_check check (sucursal_id > 0),
-	constraint patente_unique unique (patente)
+	constraint patente_unique unique (patente),
+	constraint anio_vehiculo_check check (anio > 1980 and anio <= extract(year from now()) + 1)
 )
 
 create table Tarifas_Vehiculos (
@@ -249,7 +256,7 @@ create table Sucursales_Tipos_Sucursales (
 )
 
 create table Reservas (
-	id_reserva int not null,
+	id_reserva int generated always as identity,
 	fecha_inicio_alquiler timestamp not null default now(),
 	fecha_termino_alquiler timestamp not null,
 	monto_total int not null,
@@ -259,7 +266,7 @@ create table Reservas (
 	sucursal_retiro_id int not null,
 	sucursal_entrega_id int not null,
 	constraint id_reserva_pk primary key (id_reserva),
-	constraint usuario_id_fk foreign key (usuario_id) references usuarios (id_usuarios),
+	constraint usuario_id_fk foreign key (usuario_id) references usuarios (id_usuario),
 	constraint vehiculo_id_fk foreign key (vehiculo_id) references vehiculos (id_vehiculo),
 	constraint pago_id_fk foreign key (pago_id) references pagos (id_pago),
 	constraint sucursal_retiro_id_fk foreign key (sucursal_retiro_id) references sucursales (id_sucursal),
@@ -269,7 +276,8 @@ create table Reservas (
 	constraint pago_id_check check (pago_id > 0),
 	constraint sucursal_retiro_id_check check (sucursal_retiro_id > 0),
 	constraint sucursal_entrega_id_check check (sucursal_entrega_id > 0),
-	constraint monto_total_check check (monto_total > 0)
+	constraint monto_total_check check (monto_total > 0),
+	constraint fechas_alquiler_check check (fecha_termino_alquiler > fecha_inicio_alquiler)
 )
 
 create table Reservas_Estados_Reservas (
@@ -282,21 +290,5 @@ create table Reservas_Estados_Reservas (
 	constraint reserva_id_check check (reserva_id > 0),
 	constraint estado_reserva_id_check check (estado_reserva_id > 0)
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
