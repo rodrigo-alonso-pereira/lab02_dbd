@@ -226,16 +226,16 @@ create table Vehiculos (
 	anio int not null,
 	color varchar(100) not null,
 	patente varchar(20) not null,
-	marca_id int not null,
+	modelo_id int not null,
 	estado_vehiculo_id int not null,
 	tipo_vehiculo_id int not null,
 	sucursal_id int not null,
 	constraint id_vehiculo_pk primary key (id_vehiculo),
-	constraint marca_id_fk foreign key (marca_id) references marcas (id_marca),
+	constraint modelo_id_fk foreign key (modelo_id) references Modelos (id_modelo),
 	constraint estado_vehiculo_id_fk foreign key (estado_vehiculo_id) references estados_vehiculos (id_estado_vehiculo),
 	constraint tipo_vehiculo_id_fk foreign key (tipo_vehiculo_id) references tipos_vehiculos (id_tipo_vehiculo),
 	constraint sucursal_id_fk foreign key (sucursal_id) references sucursales (id_sucursal),
-	constraint marca_id_check check (marca_id > 0),
+	constraint modelo_id_check check (modelo_id > 0),
 	constraint estado_vehiculo_id_check check (estado_vehiculo_id > 0),
 	constraint tipo_vehiculo_id_check check (tipo_vehiculo_id > 0),
 	constraint sucursal_id_check check (sucursal_id > 0),
@@ -300,7 +300,7 @@ create table Reservas_Estados_Reservas (
 );
 
 -- TRIGGERS
-
+-- procedimiento almacenado para agregar monto reserva.
 
 
 

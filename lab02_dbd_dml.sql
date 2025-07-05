@@ -6,6 +6,9 @@
 -- Alumno: Rodrigo Pereira Yañez
 --------------------------------------------------------------------------------
 
+--DROP SCHEMA public CASCADE;
+--CREATE SCHEMA public;
+
 INSERT INTO Estados_Tarifas (nombre) VALUES
 ('Activa'),
 ('Pausada'),
@@ -121,7 +124,7 @@ INSERT INTO Modelos (nombre, marca_id) VALUES
 ('Junkerolla', 3),
 ('Nave de Reparto', 4),
 ('Sedán de Lujo', 5),
-('Coche Rosa Familiar', 3),
+('Coche Familiar', 3),
 ('Minivan Familiar', 7);
 
 -- NOTA_1: total_pagado se inicia en 0 o NULL. Un trigger/procedimiento lo actualizará.
@@ -181,18 +184,17 @@ INSERT INTO Telefonos_Usuarios (telefono, usuario_id) VALUES
 ('+56922223333', 13), -- Dr. Zoidberg
 ('+56944445555', 14); -- Willie el jardinero
 
-INSERT INTO Vehiculos (anio, color, patente, marca_id, estado_vehiculo_id, tipo_vehiculo_id, sucursal_id) VALUES
+INSERT INTO Vehiculos (anio, color, patente, modelo_id, estado_vehiculo_id, tipo_vehiculo_id, sucursal_id) VALUES
 (1986, 'Rosado', 'BORT-66', 3, 5, 1, 1),        -- ID 1: Sedán de Homero. Estado: Reservado (por Lisa).
 (2024, 'Rojo', 'AY-CRMB', 2, 5, 3, 1),        -- ID 2: Canyonero. Estado: Reservado (por Flanders).
 (1992, 'Verde con burbujas', 'THEHMR', 1, 3, 1, 2), -- ID 3: The Homer. Estado: En Mantenimiento.
 (1999, 'Verde claro', 'PLN-EXP', 4, 5, 5, 3),        -- ID 4: Nave Planet Express. Estado: Reservado (por Leela).
 (2005, 'Plata', 'TFCB-01', 5, 2, 2, 3),        -- ID 5: Thundercougarfalconbird. Estado: Arrendado (por Fry).
 (1993, 'Morado', '7G04', 6, 5, 1, 2),        -- ID 6: Auto de Marge. Estado: Reservado (por Homero para agosto).
-(2022, 'Negro', 'EXLNT-1', 5, 1, 1, 4),        -- ID 7: Auto de Lujo del Sr. Burns. Estado: Disponible.
+(2022, 'Negro', 'EXLNT-1', 5, 2, 1, 4),        -- ID 7: Auto de Lujo del Sr. Burns. Estado: Arrendado.
 (2023, 'Azul', 'APU-008', 7, 2, 6, 1),         -- ID 8: Minivan de Apu. Estado: Arrendado (por Apu).
 (2025, 'Naranja', 'WOOHOO', 2, 1, 3, 2),         -- ID 9: Nuevo Canyonero. Estado: Disponible.
-(2021, 'Gris', 'MM-BEER', 6, 5, 1, 1);         -- ID 10: Nuevo Sedán. Estado: Reservado (por Bart para agosto).
-
+(2021, 'Gris', 'MM-BEER', 6, 5, 1, 1);        -- ID 10: Nuevo Sedán. Estado: Reservado (por Bart para agosto).
 
 INSERT INTO Multas (valor_multa, pago_id, tipo_multa_id) VALUES
 (30000, 4, 1), -- Multa para el pago de Bender
@@ -232,15 +234,15 @@ INSERT INTO Reservas (fecha_inicio_alquiler, fecha_termino_alquiler, monto_total
 ( '2025-05-10 10:00:00', '2025-05-12 18:00:00', 50000, 1, 1, 1, 1, 1),   -- 1. Homero: Finalizada
 ( '2025-06-20 10:00:00', '2025-06-22 18:00:00', 60000, 2, 6, 2, 1, 2),   -- 2. Marge: Cancelada
 ( '2025-06-01 09:00:00', '2025-08-30 17:00:00', 300000, 3, 7, 3, 4, 4),   -- 3. Burns: Finalizada
-( '3025-03-01 12:00:00', '3025-03-05 12:00:00', 4000000, 4, 4, 4, 3, 3),   -- 4. Bender: Finalizada con retraso
+( '2025-03-01 12:00:00', '2025-03-05 12:00:00', 4000000, 4, 4, 4, 3, 3),   -- 4. Bender: Finalizada con retraso
 ( '2025-07-04 10:00:00', '2025-07-10 18:00:00', 350000, 5, 5, 5, 3, 3),   -- 5. Fry: En Curso
 ( '2025-08-01 10:00:00', '2025-08-05 18:00:00', 120000, 6, 1, 6, 1, 1),   -- 6. Lisa: Futura Confirmada (Agosto)
 ( '2025-04-15 11:00:00', '2025-04-16 19:00:00', 40000, 7, 2, 7, 1, 1),   -- 7. Moe: Finalizada
 ( '2025-06-05 10:00:00', '2025-06-07 18:00:00', 80000, 9, 2, 8, 1, 2),   -- 8. Bart: Finalizada
 ( '2025-07-02 09:00:00', '2025-07-09 09:00:00', 175000, 10, 8, 9, 1, 1),  -- 9. Apu: En Curso
 ( '2025-07-20 10:00:00', '2025-07-22 10:00:00', 80000, 11, 2, 10, 1, 1),  -- 10. Flanders: Futura Confirmada
-( '3024-01-01 10:00:00', '3024-01-10 10:00:00', 9000000, 12, 4, 11, 3, 3), -- 11. Profesor Farnsworth: Finalizada
-( '3025-09-10 10:00:00', '3025-09-15 10:00:00', 5000000, 8, 4, 12, 3, 3),   -- 12. Leela: Futura Confirmada
+( '2024-01-01 10:00:00', '2024-01-10 10:00:00', 9000000, 12, 4, 11, 3, 3), -- 11. Profesor Farnsworth: Finalizada
+( '2025-09-10 10:00:00', '2025-09-15 10:00:00', 5000000, 8, 4, 12, 3, 3),   -- 12. Leela: Futura Confirmada
 ( '2025-03-05 09:00:00', '2025-03-10 18:00:00', 250000, 1, 9, 13, 2, 2), -- 13. Homero: Finalizada (2da reserva)
 ( '2025-05-15 10:00:00', '2025-05-20 10:00:00', 200000, 9, 9, 14, 1, 2), -- 14. Bart: Finalizada (2da reserva)
 ( '2025-02-10 11:00:00', '2025-02-12 11:00:00', 50000, 7, 1, 15, 1, 1), -- 15. Moe: Finalizada (2da reserva)

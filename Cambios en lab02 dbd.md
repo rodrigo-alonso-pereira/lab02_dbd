@@ -10,3 +10,4 @@
 7. Se cambio en usuarios password por clave
 8. Se agrega a pagos la columna total_pagado q seguira siendo calculado pero guardado, no solo calculo
 9. Se agrega nombre a sucursal
+10. Vehiculo tiene un modelo_id y modelo tiene una marca_id, cambia el orden
