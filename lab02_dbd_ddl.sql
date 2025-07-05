@@ -1,37 +1,44 @@
+--------------------------------------------------------------------------------
+-- Script de Creacion de Modelo de datos para Rent a Car de Springfield
+-- Versión: 1.0
+-- Motor de BD: PostgreSQL 16.9
+-- Alumno: Rodrigo Pereira Yañez
+--------------------------------------------------------------------------------
+
 create table Estados_Tarifas (
 	id_estado_tarifa int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_estado_tarifa_pk primary key (id_estado_tarifa),
 	constraint nombre_estado_tarifa_unique unique (nombre)
-)
+);
 
 create table Tipos_Tarifas (
 	id_tipo_tarifa int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_tipo_tarifa_pk primary key (id_tipo_tarifa),
 	constraint nombre_tipo_tarifa_unique unique (nombre)
-)
+);
 
 create table Estados_Vehiculos (
 	id_estado_vehiculo int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_estado_vehiculo_pk primary key (id_estado_vehiculo),
 	constraint nombre_estado_vehiculo_unique unique (nombre)
-)
+);
 
 create table Tipos_Vehiculos (
 	id_tipo_vehiculo int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_tipo_vehiculo_pk primary key (id_tipo_vehiculo),
 	constraint nombre_tipo_vehiculo_unique unique (nombre)
-)
+);
 
 create table Tipos_Sucursales (
 	id_tipo_sucursal int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_tipo_sucursal_pk primary key (id_tipo_sucursal),
 	constraint nombre_tipo_sucursal_unique unique (nombre)
-)
+);
 
 create table Direcciones (
 	id_direccion int generated always as identity,
@@ -41,35 +48,35 @@ create table Direcciones (
 	region varchar(200) not null,
 	constraint id_direccion_pk primary key (id_direccion),
 	constraint numero_calle_check check (numero_calle > 0)
-)
+);
 
 create table Tipos_Usuarios (
 	id_tipo_usuario int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_tipo_usuario_pk primary key (id_tipo_usuario),
 	constraint nombre_tipo_usuario_unique unique (nombre)
-)
+);
 
 create table Roles (
 	id_rol int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_rol_pk primary key (id_rol),
 	constraint nombre_rol_unique unique (nombre)
-)
+);
 
 create table Estados_Reservas (
 	id_estado_reserva int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_estado_reserva_pk primary key (id_estado_reserva),
 	constraint nombre_estado_reserva_unique unique (nombre)
-)
+);
 
 create table Metodos_Pagos (
 	id_metodo_pago int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_metodo_pago_pk primary key (id_metodo_pago),
 	constraint nombre_metodo_pago_unique unique (nombre)
-)
+);
 
 create table tipos_multas (
 	id_tipo_multa int generated always as identity,
@@ -77,21 +84,21 @@ create table tipos_multas (
 	valor int not null default 0,
 	constraint id_tipo_multa_pk primary key (id_tipo_multa),
 	constraint valor_check check (valor >= 0) 
-)
+);
 
 create table Estados_Cuotas (
 	id_estado_cuota int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_estado_cuota_pk primary key (id_estado_cuota),
 	constraint nombre_estado_cuota_unique unique (nombre)
-)
+);
 
 create table Marcas (
 	id_marca int generated always as identity,
 	nombre varchar(200) not null,
 	constraint id_marca_pk primary key (id_marca),
 	constraint nombre_marca_unique unique (nombre)
-)
+);
 
 create table Tarifas (
 	id_tarifa int generated always as identity,
@@ -107,10 +114,11 @@ create table Tarifas (
 	constraint tipo_tarifa_id_check check (tipo_tarifa_id > 0),
 	constraint estado_tarifa_id_check check (estado_tarifa_id > 0),
 	constraint fechas_alquiler_check check (fecha_termino_vigencia_tarifa > fecha_inicio_vigencia_tarifa)
-)
+);
 
 create table Sucursales (
 	id_sucursal int generated always as identity,
+	nombre varchar(200) not null,
 	hora_inicio_operacion time not null default '09:00:00',
 	hora_fin_operacion time not null default '18:00:00',
 	direccion_id int not null,
@@ -118,7 +126,7 @@ create table Sucursales (
 	constraint direccion_id_fk foreign key (direccion_id) references direcciones (id_direccion),
 	constraint direccion_id_check check (direccion_id > 0),
 	constraint horas_operacion_check check (hora_fin_operacion > hora_inicio_operacion)
-)
+);
 
 create table Telefonos_Sucursales (
 	id_telefono_sucursal int generated always as identity,
@@ -129,7 +137,7 @@ create table Telefonos_Sucursales (
 	constraint sucursal_id_fk foreign key (sucursal_id) references sucursales (id_sucursal),
 	constraint sucursal_id_check check (sucursal_id > 0),
 	constraint telefono_unique unique (telefono)
-)
+);
 
 create table Usuarios (
 	id_usuario int generated always as identity,
@@ -150,7 +158,7 @@ create table Usuarios (
 	constraint direccion_id_check check (direccion_id > 0),
 	constraint email_unique unique (email),
 	constraint rut_unique unique (rut)
-)
+);
 
 create table Telefonos_Usuarios (
 	id_telefono_usuario int generated always as identity,
@@ -160,7 +168,7 @@ create table Telefonos_Usuarios (
 	constraint id_telefono_usuario_pk primary key (id_telefono_usuario),
 	constraint usuario_id_fk foreign key (usuario_id) references usuarios (id_usuario),
 	constraint usuario_id_check check (usuario_id > 0)
-)
+);
 
 create table Pagos (
 	id_pago int generated always as identity,
@@ -171,7 +179,7 @@ create table Pagos (
 	constraint id_pago_pk primary key (id_pago),
 	constraint metodo_pago_id_fk foreign key (metodo_pago_id) references metodos_pagos (id_metodo_pago),
 	constraint metodo_pago_id_check check (metodo_pago_id > 0)
-)
+);
 
 create table Multas (
 	id_multa int generated always as identity,
@@ -184,7 +192,7 @@ create table Multas (
 	constraint tipo_multa_id_fk foreign key (tipo_multa_id) references tipos_multas (id_tipo_multa),
 	constraint pago_id_check check (pago_id > 0),
 	constraint tipo_multa_id_check check (tipo_multa_id > 0)
-)
+);
 
 create table Cuotas (
 	id_cuota int generated always as identity,
@@ -201,7 +209,7 @@ create table Cuotas (
 	constraint numero_cuota_check check (numero_cuota > 0),
 	constraint pago_id_check check (pago_id > 0),
 	constraint estado_cuota_id_check check (estado_cuota_id > 0)
-)
+);
 
 create table Modelos (
 	id_modelo int generated always as identity,
@@ -211,7 +219,7 @@ create table Modelos (
 	constraint marca_id_fk foreign key (marca_id) references marcas (id_marca),
 	constraint marca_id_check check (marca_id > 0),
 	constraint nombre_marca_id_unique unique (nombre, marca_id)
-)
+);
 
 create table Vehiculos (
 	id_vehiculo int generated always as identity,
@@ -233,7 +241,7 @@ create table Vehiculos (
 	constraint sucursal_id_check check (sucursal_id > 0),
 	constraint patente_unique unique (patente),
 	constraint anio_vehiculo_check check (anio > 1980 and anio <= extract(year from now()) + 1)
-)
+);
 
 create table Tarifas_Vehiculos (
 	vehiculo_id int not null,
@@ -243,7 +251,7 @@ create table Tarifas_Vehiculos (
 	constraint tarifa_id_fk foreign key (tarifa_id) references tarifas (id_tarifa),
 	constraint vehiculo_id_check check (vehiculo_id > 0),
 	constraint tarifa_id_check check (tarifa_id > 0)
-)
+);
 
 create table Sucursales_Tipos_Sucursales (
 	sucursal_id int not null,
@@ -253,7 +261,7 @@ create table Sucursales_Tipos_Sucursales (
 	constraint tipo_sucursal_id_fk foreign key (tipo_sucursal_id) references tipos_sucursales (id_tipo_sucursal),
 	constraint sucursal_id_check check (sucursal_id > 0),
 	constraint tipo_sucursal_id_check check (tipo_sucursal_id > 0)
-)
+);
 
 create table Reservas (
 	id_reserva int generated always as identity,
@@ -278,7 +286,7 @@ create table Reservas (
 	constraint sucursal_entrega_id_check check (sucursal_entrega_id > 0),
 	constraint monto_total_check check (monto_total > 0),
 	constraint fechas_alquiler_check check (fecha_termino_alquiler > fecha_inicio_alquiler)
-)
+);
 
 create table Reservas_Estados_Reservas (
 	reserva_id int not null,
@@ -289,6 +297,10 @@ create table Reservas_Estados_Reservas (
 	constraint estado_reserva_id_fk foreign key (estado_reserva_id) references estados_reservas (id_estado_reserva),
 	constraint reserva_id_check check (reserva_id > 0),
 	constraint estado_reserva_id_check check (estado_reserva_id > 0)
-)
+);
+
+-- TRIGGERS
+
+
 
 
