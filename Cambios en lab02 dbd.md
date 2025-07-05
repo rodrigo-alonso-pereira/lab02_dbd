@@ -9,3 +9,4 @@
 6. Se cambia datetime -> timestamp
 7. Se cambio en usuarios password por clave
 8. Se agrega a pagos la columna total_pagado q seguira siendo calculado pero guardado, no solo calculo
+9. Se agrega nombre a sucursal
