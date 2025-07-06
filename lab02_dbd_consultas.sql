@@ -78,8 +78,60 @@ order by cantidad_arriendos desc;
 select count(r.id_reserva) as cantidad_reservas
 from reservas r 
 where (r.fecha_inicio_alquiler, r.fecha_termino_alquiler) 
-      overlaps (date_trunc('year', now()), now());
+	overlaps (date_trunc('year', now()), now());
 
 -- 4. ¿Qué sucursal generó más reservas el último mes?
+select s.id_sucursal, s.nombre as nombre_sucursal, count(r.sucursal_reserva_id) as total_reservas_generadoas
+from reservas r 
+join sucursales s on s.id_sucursal = r.sucursal_reserva_id
+join reservas_estados_reservas rer on rer.reserva_id = r.id_reserva
+join estados_reservas er on rer.estado_reserva_id = er.id_estado_reserva
+where er.nombre = 'Creada' and rer.fecha_estado_reserva >= (now() - interval '1 month')
+group by s.id_sucursal, s.nombre
+order by count(r.sucursal_reserva_id) desc
+limit 1;
+
+-- 5. ¿De las reservas cuya sucursal de retiro es diferente a la de entrega, cuántos vehículos, de cada tipo, han sido arrendados?
+select tv.nombre, count(tv.id_tipo_vehiculo) as cantidad_tipo_vehiculo
+from reservas r
+join vehiculos v on r.vehiculo_id = v.id_vehiculo
+join tipos_vehiculos tv on v.tipo_vehiculo_id = tv.id_tipo_vehiculo
+where r.sucursal_entrega_id != r.sucursal_retiro_id 
+	and r.id_reserva not in (
+		select rer.reserva_id -- Selecciona vehiculos que tienen estado de cancelado para no incluirlos en el conteo
+		from reservas_estados_reservas rer 
+		join estados_reservas er on er.id_estado_reserva = rer.estado_reserva_id
+		where er.nombre = 'Cancelada'  
+	)
+group by tv.nombre
+order by cantidad_tipo_vehiculo desc;
+
+-- 6. ¿Cuál es el promedio de días que dura una reserva? (Usando todas las reservas que existen en la bd)
+
+-- Nota: round(..., 2) redondeamos el promedio final (dias) a 2 decimales
+--		 avg(...) calcula el promedio de dias
+--		 extract(epoch from) extrae el total de segundo de un intervalo de fecha
+--       /86400 (total segundos de un dia 60*60*24) se divide para obtener cantidad de dias
+select round(avg(extract(epoch from(r.fecha_termino_alquiler - r.fecha_inicio_alquiler))/86400), 2) as duracion_prmedio_reserva
+from reservas r
+where r.id_reserva not in (
+	select rer.reserva_id -- Selecciona vehiculos que tienen estado de cancelado para no incluirlos en el conteo
+	from reservas_estados_reservas rer 
+	join estados_reservas er on er.id_estado_reserva = rer.estado_reserva_id
+	where er.nombre = 'Cancelada'  
+);
+
+-- 7. Ranking de los 3 clientes que más reservas tienen finalizadas.
+select u.nombre_completo as nombre_usuario, count(er.id_estado_reserva)
+from reservas r 
+join usuarios u on u.id_usuario = r.usuario_id
+join reservas_estados_reservas rer on rer.reserva_id = r.id_reserva
+join estados_reservas er on er.id_estado_reserva = rer.estado_reserva_id
+where er.nombre = 'Finalizada'
+group by u.nombre_completo
+order by count(er.id_estado_reserva) desc
+limit 3;
+
+
 
 

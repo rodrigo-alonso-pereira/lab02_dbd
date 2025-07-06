@@ -11,3 +11,4 @@
 8. Se agrega a pagos la columna total_pagado q seguira siendo calculado pero guardado, no solo calculo
 9. Se agrega nombre a sucursal
 10. Vehiculo tiene un modelo_id y modelo tiene una marca_id, cambia el orden
+11. Reserva tiene un atributo sucursal_reserva_id ya que la sucursal_retiro y entrega pueden ser diferentes de donde se reservo.

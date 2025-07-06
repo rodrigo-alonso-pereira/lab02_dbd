@@ -271,17 +271,20 @@ create table Reservas (
 	usuario_id int not null,
 	vehiculo_id int not null,
 	pago_id int not null,
+	sucursal_reserva_id int not null,
 	sucursal_retiro_id int not null,
 	sucursal_entrega_id int not null,
 	constraint id_reserva_pk primary key (id_reserva),
 	constraint usuario_id_fk foreign key (usuario_id) references usuarios (id_usuario),
 	constraint vehiculo_id_fk foreign key (vehiculo_id) references vehiculos (id_vehiculo),
 	constraint pago_id_fk foreign key (pago_id) references pagos (id_pago),
+	constraint sucursal_reserva_id_fk foreign key (sucursal_reserva_id) references sucursales (id_sucursal),
 	constraint sucursal_retiro_id_fk foreign key (sucursal_retiro_id) references sucursales (id_sucursal),
 	constraint sucursal_entrega_id_fk foreign key (sucursal_entrega_id) references sucursales (id_sucursal),
 	constraint usuario_id_check check (usuario_id > 0),
 	constraint vehiculo_id_check check (vehiculo_id > 0),
 	constraint pago_id_check check (pago_id > 0),
+	constraint sucursal_reserva_id_check check (sucursal_reserva_id > 0),
 	constraint sucursal_retiro_id_check check (sucursal_retiro_id > 0),
 	constraint sucursal_entrega_id_check check (sucursal_entrega_id > 0),
 	constraint monto_total_check check (monto_total > 0),
@@ -301,6 +304,197 @@ create table Reservas_Estados_Reservas (
 
 -- TRIGGERS
 -- procedimiento almacenado para agregar monto reserva.
+
+-- NOTA: Orden esperado de estado_vehiculo segun estado_reserva
+-- Estado_Reserva -->  Estado_Vehiculo
+-- Creada	      -->  Disponible  x
+-- Confirmada	  -->  Reservado   x
+-- En Curso	      -->  Arrendado   x
+-- Finalizada	  -->  Disponible  x
+-- Cancelada	  -->  Disponible  x
+-- Retrasada	  -->  Arrendado   x
+
+-- Actualizar el estado del vehículo al confirmar una reserva: Cuando se actualiza una reserva 
+-- con estado ‘En curso’, el vehículo asociado debe cambiar su estado a 'Arrendado'.
+
+create or replace function actualizar_estado_vehiculo_en_curso()
+returns trigger as $$
+declare
+	r_id_estado_en_curso int;
+	v_id_estado_arrendado int;
+	v_id_vehiculo int;
+begin
+	select id_estado_reserva into r_id_estado_en_curso from Estados_Reservas where nombre = 'En Curso';
+	select id_estado_vehiculo into v_id_estado_arrendado from Estados_Vehiculos where nombre = 'Arrendado';
+	
+	if new.estado_reserva_id = r_id_estado_en_curso then
+		select vehiculo_id into v_id_vehiculo from Reservas where id_reserva = new.reserva_id;
+		update vehiculos
+		set estado_vehiculo_id = v_id_estado_arrendado
+		where id_vehiculo = v_id_vehiculo;
+	end if;
+	return new;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger tr_actualizar_estado_vehiculo_en_curso
+after insert on Reservas_Estados_Reservas
+for each row
+execute function actualizar_estado_vehiculo_en_curso();
+
+-- Liberar vehículo al finalizar una reserva: Si una reserva cambia a estado 'Finalizada', 
+-- el vehículo debe quedar disponible ('Disponible') y moverse a la sucursal de destino.
+
+create or replace function actualizar_estado_vehiculo_finalizada()
+returns trigger as $$
+declare
+	r_id_estado_finalizado int;
+	v_id_estado_disponible int;
+	v_id_vehiculo int;
+begin
+	select id_estado_reserva into r_id_estado_finalizado from Estados_Reservas where nombre = 'Finalizada';
+	select id_estado_vehiculo into v_id_estado_disponible from Estados_Vehiculos where nombre = 'Disponible';
+	
+	if new.estado_reserva_id = r_id_estado_finalizado then
+		select vehiculo_id into v_id_vehiculo from Reservas where id_reserva = new.reserva_id;
+		update vehiculos
+		set estado_vehiculo_id = v_id_estado_disponible
+		where id_vehiculo = v_id_vehiculo;
+	end if;
+	return new;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger tr_actualizar_estado_vehiculo_finalizada
+after insert on Reservas_Estados_Reservas
+for each row
+execute function actualizar_estado_vehiculo_finalizada();
+
+-- OPCIONAL: Confirmada	  -->  Reservado
+create or replace function actualizar_estado_vehiculo_confirmado()
+returns trigger as $$
+declare
+	r_id_estado_finalizado int;
+	v_id_estado_disponible int;
+	v_id_vehiculo int;
+begin
+	select id_estado_reserva into r_id_estado_finalizado from Estados_Reservas where nombre = 'Confirmada';
+	select id_estado_vehiculo into v_id_estado_disponible from Estados_Vehiculos where nombre = 'Reservado';
+	
+	if new.estado_reserva_id = r_id_estado_finalizado then
+		select vehiculo_id into v_id_vehiculo from Reservas where id_reserva = new.reserva_id;
+		update vehiculos
+		set estado_vehiculo_id = v_id_estado_disponible
+		where id_vehiculo = v_id_vehiculo;
+	end if;
+	return new;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger tr_actualizar_estado_vehiculo_confirmado
+after insert on Reservas_Estados_Reservas
+for each row
+execute function actualizar_estado_vehiculo_confirmado();
+
+-- OPCIONAL: Cancelada	  -->  Disponible
+create or replace function actualizar_estado_vehiculo_cancelado()
+returns trigger as $$
+declare
+	r_id_estado_finalizado int;
+	v_id_estado_disponible int;
+	v_id_vehiculo int;
+begin
+	select id_estado_reserva into r_id_estado_finalizado from Estados_Reservas where nombre = 'Cancelada';
+	select id_estado_vehiculo into v_id_estado_disponible from Estados_Vehiculos where nombre = 'Disponible';
+	
+	if new.estado_reserva_id = r_id_estado_finalizado then
+		select vehiculo_id into v_id_vehiculo from Reservas where id_reserva = new.reserva_id;
+		update vehiculos
+		set estado_vehiculo_id = v_id_estado_disponible
+		where id_vehiculo = v_id_vehiculo;
+	end if;
+	return new;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger tr_actualizar_estado_vehiculo_cancelado
+after insert on Reservas_Estados_Reservas
+for each row
+execute function actualizar_estado_vehiculo_cancelado();
+
+-- OPCIONAL: Retrasada	  -->  Arrendado
+create or replace function actualizar_estado_vehiculo_retrasado()
+returns trigger as $$
+declare
+	r_id_estado_finalizado int;
+	v_id_estado_disponible int;
+	v_id_vehiculo int;
+begin
+	select id_estado_reserva into r_id_estado_finalizado from Estados_Reservas where nombre = 'Retrasada';
+	select id_estado_vehiculo into v_id_estado_disponible from Estados_Vehiculos where nombre = 'Arrendado';
+	
+	if new.estado_reserva_id = r_id_estado_finalizado then
+		select vehiculo_id into v_id_vehiculo from Reservas where id_reserva = new.reserva_id;
+		update vehiculos
+		set estado_vehiculo_id = v_id_estado_disponible
+		where id_vehiculo = v_id_vehiculo;
+	end if;
+	return new;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger tr_actualizar_estado_vehiculo_retrasado
+after insert on Reservas_Estados_Reservas
+for each row
+execute function actualizar_estado_vehiculo_retrasado();
+
+-- Consulta para evaluar funcionamiento trigger
+--select distinct on (r.id_reserva) r.id_reserva, u.nombre_completo , r.vehiculo_id, ev.nombre as estado_vehiculo ,rer.estado_reserva_id, er.nombre as estado_reserva, rer.fecha_estado_reserva
+--from reservas r 
+--join reservas_estados_reservas rer on rer.reserva_id = r.id_reserva
+--join estados_reservas er on er.id_estado_reserva = rer.estado_reserva_id
+--join usuarios u on u.id_usuario = r.usuario_id
+--join vehiculos v on v.id_vehiculo = r.vehiculo_id
+--join estados_vehiculos ev on ev.id_estado_vehiculo = v.estado_vehiculo_id
+--order by r.id_reserva, rer.fecha_estado_reserva desc;
+
+-- Inserciones de prueba: Confirmada  -->  Reservado
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 2);
+-- Inserciones de prueba: En Curso	-->  Arrendado
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 3);
+-- Inserciones de prueba: Finalizada  -->  Disponible 
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 4);
+-- Inserciones de prueba: Cancelada	  -->  Disponible
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 5);
+-- Inserciones de prueba: Retrasada	  -->  Arrendado
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 6);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
