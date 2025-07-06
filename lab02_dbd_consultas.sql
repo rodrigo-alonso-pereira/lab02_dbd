@@ -72,7 +72,8 @@ where r.id_reserva not in (
 	where er.nombre = 'Cancelada'
 )
 group by tv.nombre
-order by cantidad_arriendos desc;
+order by cantidad_arriendos desc
+limit 1;
 
 -- 3. ¿Cuántas reservas hay desde comienzos de año hasta la fecha actual?
 select count(r.id_reserva) as cantidad_reservas
