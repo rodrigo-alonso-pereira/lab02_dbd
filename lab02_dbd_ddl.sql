@@ -458,16 +458,17 @@ execute function actualizar_estado_vehiculo_retrasado();
 --join estados_vehiculos ev on ev.id_estado_vehiculo = v.estado_vehiculo_id
 --order by r.id_reserva, rer.fecha_estado_reserva desc;
 
+-- Inserciones de prueba triggers para Homero Simpson con reserva=creada y estado_vehiculo=disponible
 -- Inserciones de prueba: Confirmada  -->  Reservado
---INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 2);
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (17, 2);
 -- Inserciones de prueba: En Curso	-->  Arrendado
---INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 3);
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (17, 3);
 -- Inserciones de prueba: Finalizada  -->  Disponible 
---INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 4);
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (17, 4);
 -- Inserciones de prueba: Cancelada	  -->  Disponible
---INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 5);
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (17, 5);
 -- Inserciones de prueba: Retrasada	  -->  Arrendado
---INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (18, 6);
+--INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id) VALUES (17, 6);
 
 
 

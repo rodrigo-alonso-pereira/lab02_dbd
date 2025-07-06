@@ -246,9 +246,7 @@ INSERT INTO Reservas (fecha_inicio_alquiler, fecha_termino_alquiler, monto_total
 ( '2025-08-10 10:00:00', '2025-08-15 18:00:00', 125000, 1, 6, 17, 4, 2, 2), -- 17. Homero (4ta reserva)
 ( '2025-08-20 09:00:00', '2025-08-22 18:00:00', 75000, 9, 10, 18, 2, 1, 1); -- 18. Bart (3ra reserva)
 
--- NOTA: Para un buen funcionamiento del trigger se recomienda ingresar de a un Reservas_Estados_Reservas 
 -- NOTA: Se ordenan todos los INSERT para seguir un orden cronológico estricto.
-
 -- Historial Reserva 11 (Profesor Farnsworth, 2024)
 INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id, fecha_estado_reserva) VALUES (11, 1, '2023-12-20 10:00:00'); -- Creada
 INSERT INTO Reservas_Estados_Reservas (reserva_id, estado_reserva_id, fecha_estado_reserva) VALUES (11, 2, '2023-12-21 11:00:00'); -- Confirmada
